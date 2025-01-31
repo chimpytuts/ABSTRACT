@@ -1,0 +1,34 @@
+# Hardhat files
+artifacts
+artifacts-zk
+cache
+cache-zk
+coverage
+coverage.json
+typechain
+typechain-types
+
+# IDE files
+.vscode
+.idea
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Dependencies
+node_modules
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Misc
+.DS_Store
+*.pem
