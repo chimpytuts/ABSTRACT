@@ -1,5 +1,6 @@
 const { Wallet } = require("zksync-web3");
 const { Deployer } = require("@matterlabs/hardhat-zksync-deploy");
+const { ethers } = require("ethers");
 const hre = require("hardhat");
 
 module.exports = async function (hre) {
@@ -23,10 +24,15 @@ module.exports = async function (hre) {
       throw error;
     });
 
+    // Convert the large number to BigNumber
+    const rewardAmount = ethers.utils.parseEther("5.05"); // 5.05 tokens with 18 decimals
+
     console.log("Deploying MONDMasterChef...");
     const MONDMasterChef = await deployer.deploy(mondMasterChef, [
-      "0xA06e92c4A9D5Fe540666e1BFf10982d496D5A70D",  // vault address
-      "0x95d457A84e830a76Be47419427814CeFbD0c269F"   // admin address
+      "0x11b4d31355BBbeA892f53f4BA07604C9441FdE80",  // vault address
+      "0x95d457A84e830a76Be47419427814CeFbD0c269F",  // admin address
+      rewardAmount,                                    // using BigNumber
+      61101000,                                        // block number
     ]);
     await MONDMasterChef.deployed();
     
