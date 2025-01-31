@@ -12,28 +12,19 @@ async function main() {
   const deployer = new Deployer(hre, wallet);
 
   try {
-    // First deploy the implementation
-    console.log("Deploying Vault implementation...");
+    console.log("Deploying Vault...");
     const vaultArtifact = await deployer.loadArtifact("Vault");
-    const vaultImpl = await deployer.deploy(vaultArtifact, [
+    const vault = await deployer.deploy(vaultArtifact, [
       "0x89bEb77FE5BF8e748E0AE9cFBF75AeA9517752b2",  // authorizer
       "0x3439153eb7af838ad19d56e1571fbd09333c2809",  // weth
-      7776000,  // pauseWindowDuration
-      2592000   // bufferPeriodDuration
+      7776000,  // pauseWindowDuration (90 days)
+      2592000   // bufferPeriodDuration (30 days)
     ]);
-    await vaultImpl.deployed();
-    console.log("Vault implementation deployed to:", vaultImpl.address);
-
-    // Then deploy the proxy
-    console.log("Deploying VaultProxy...");
-    const proxyArtifact = await deployer.loadArtifact("VaultProxy");
-    const proxy = await deployer.deploy(proxyArtifact, [vaultImpl.address]);
-    await proxy.deployed();
-    console.log("VaultProxy deployed to:", proxy.address);
-
+    await vault.deployed();
+    
     console.log("✅ Deployment completed!");
-    console.log("Implementation address:", vaultImpl.address);
-    console.log("Proxy address (use this for interactions):", proxy.address);
+    console.log("Vault deployed to:", vault.address);
+    console.log("Transaction hash:", vault.deployTransaction.hash);
   } catch (error) {
     console.error("❌ Deployment failed:", error);
     process.exit(1);

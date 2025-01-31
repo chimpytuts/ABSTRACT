@@ -1,23 +1,23 @@
 require("dotenv").config();
 require("@matterlabs/hardhat-zksync-deploy");
 require("@matterlabs/hardhat-zksync-solc");
-require("@nomicfoundation/hardhat-verify");
+require("@matterlabs/hardhat-zksync-verify");
 
 module.exports = {
   zksolc: {
-    version: "1.3.13",
+    version: "1.5.11",
     compilerSource: "binary",
     settings: {
       isSystem: true,
-      forceEvmla: true,
+      forceEvmla: false,
       optimizer: {
         enabled: true,
         mode: "3",
-        runs: 1,
+        runs: 200
       },
       experimental: {
-        dockerImage: "matterlabs/zksolc",
-        tag: "v1.3.13",
+        yul: true,
+        yulOptimizer: true,
       },
     },
   },
@@ -26,7 +26,6 @@ module.exports = {
     abstractMainnet: {
       url: "https://api.mainnet.abs.xyz",
       ethNetwork: "mainnet",
-      chainId: 2741,
       zksync: true,
       accounts: [process.env.PRIVATE_KEY],
     },
@@ -49,28 +48,32 @@ module.exports = {
   solidity: {
     compilers: [
       {
-        version: "0.7.6",
+        version: "0.7.1",
         settings: {
           viaIR: true,
+          evmVersion: "istanbul",
           optimizer: {
             enabled: true,
-            runs: 1,
+            runs: 200
           },
-          evmVersion: "istanbul",
-        },
-      },
-      {
-        version: "0.8.7",
-        settings: {
-          viaIR: true,
-          optimizer: {
-            enabled: true,
-            runs: 1,
+          metadata: {
+            bytecodeHash: "none"
           },
-          evmVersion: "istanbul",
+          outputSelection: {
+            "*": {
+              "*": [
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "abi"
+              ]
+            }
+          }
         },
       }
     ],
   },
+  mocha: {
+    timeout: 40000
+  }
 };
 
