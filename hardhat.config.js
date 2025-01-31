@@ -1,7 +1,7 @@
 require("dotenv").config();
 require("@matterlabs/hardhat-zksync-deploy");
 require("@matterlabs/hardhat-zksync-solc");
-require("@matterlabs/hardhat-zksync-verify");
+require("@nomicfoundation/hardhat-verify");
 
 module.exports = {
   zksolc: {
@@ -13,11 +13,10 @@ module.exports = {
       optimizer: {
         enabled: true,
         mode: "3",
-        runs: 200
       },
       experimental: {
-        yul: true,
-        yulOptimizer: true,
+        dockerImage: "matterlabs/zksolc",
+        tag: "v1.5.11",
       },
     },
   },
@@ -26,6 +25,7 @@ module.exports = {
     abstractMainnet: {
       url: "https://api.mainnet.abs.xyz",
       ethNetwork: "mainnet",
+      chainId: 2741,
       zksync: true,
       accounts: [process.env.PRIVATE_KEY],
     },
@@ -51,29 +51,24 @@ module.exports = {
         version: "0.7.1",
         settings: {
           viaIR: true,
-          evmVersion: "istanbul",
           optimizer: {
             enabled: true,
-            runs: 200
+            runs: 1,
           },
-          metadata: {
-            bytecodeHash: "none"
+          evmVersion: "istanbul",
+        },
+      },
+      {
+        version: "0.8.7",
+        settings: {
+          viaIR: true,
+          optimizer: {
+            enabled: true,
+            runs: 1,
           },
-          outputSelection: {
-            "*": {
-              "*": [
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "abi"
-              ]
-            }
-          }
+          evmVersion: "istanbul",
         },
       }
     ],
   },
-  mocha: {
-    timeout: 40000
-  }
 };
-

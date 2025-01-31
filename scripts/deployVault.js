@@ -5,15 +5,26 @@ const hre = require("hardhat");
 async function main() {
   console.log("Starting deployment process...");
 
-  const provider = new Provider("https://api.mainnet.abs.xyz");
-  const wallet = new Wallet(process.env.PRIVATE_KEY, provider);
-  console.log("Wallet initialized:", wallet.address);
-
-  const deployer = new Deployer(hre, wallet);
-
   try {
+    // Verify environment variable
+    if (!process.env.PRIVATE_KEY) {
+      throw new Error("PRIVATE_KEY environment variable is not set");
+    }
+
+    const provider = new Provider("https://api.mainnet.abs.xyz");
+    const wallet = new Wallet(process.env.PRIVATE_KEY, provider);
+    console.log("Wallet initialized:", wallet.address);
+
+    const deployer = new Deployer(hre, wallet);
+
+    // Add artifact loading error handling
+    console.log("Loading Vault artifact...");
+    const vaultArtifact = await deployer.loadArtifact("Vault").catch(error => {
+      console.error("Failed to load Vault artifact:", error);
+      throw error;
+    });
+
     console.log("Deploying Vault...");
-    const vaultArtifact = await deployer.loadArtifact("Vault");
     const vault = await deployer.deploy(vaultArtifact, [
       "0x89bEb77FE5BF8e748E0AE9cFBF75AeA9517752b2",  // authorizer
       "0x3439153eb7af838ad19d56e1571fbd09333c2809",  // weth
