@@ -5,21 +5,39 @@ require("@nomicfoundation/hardhat-verify");
 
 module.exports = {
   zksolc: {
-    version: "1.5.11",
-    compilerSource: "binary",
+    version: "latest", // optional.
     settings: {
-      isSystem: true,
-      forceEvmla: false,
+      libraries:{}, // optional. References to non-inlinable libraries
+      missingLibrariesPath: "./.zksolc-libraries-cache/missingLibraryDependencies.json", // optional. This path serves as a cache that stores all the libraries that are missing or have dependencies on other libraries. A `hardhat-zksync-deploy` plugin uses this cache later to compile and deploy the libraries, especially when the `deploy-zksync:libraries` task is executed
+      compilerSource: "binary", // Add this line to use docker instead of local binary
+      enableEraVMExtensions: true, // optional.  Enables Yul instructions available only for ZKsync system contracts and libraries
       optimizer: {
-        enabled: true,
-        mode: "3",
+        enabled: true, // optional. True by default
+        mode: '3', // optional. 3 by default, z to optimize bytecode size
+        fallback_to_optimizing_for_size: false, // optional. Try to recompile with optimizer mode "z" if the bytecode is too large
       },
+      suppressedWarnings: ["assemblycreate"],
+      suppressedErrors: ["sendtransfer"],
       experimental: {
-        dockerImage: "matterlabs/zksolc",
-        tag: "v1.5.11",
+        dockerImage: '', // deprecated
+        tag: ''   // deprecated
       },
-    },
-  },
+      contractsToCompile: [], //optional. Compile only specific contracts
+      codegen: 'evmla',
+      isSystem: true, 
+      metadata: {
+        bytecodeHash: "none"
+      },
+      settings: {                 // Additional settings for handling assembly
+        allowUnlimitedContractSize: true,
+        viaIR: true,
+        optimizer: {
+          enabled: true,
+          runs: 200
+        }
+      }  
+    }
+},
   defaultNetwork: "abstractMainnet",
   networks: {
     abstractMainnet: {
@@ -51,22 +69,54 @@ module.exports = {
         version: "0.7.1",
         settings: {
           viaIR: true,
+          evmVersion: "istanbul",
           optimizer: {
             enabled: true,
-            runs: 1,
+            runs: 200,
           },
-          evmVersion: "istanbul",
+          outputSelection: {
+            "*": {
+              "*": [
+                "evm.bytecode.object",
+                "evm.deployedBytecode.object",
+                "abi",
+                "evm.bytecode.sourceMap",
+                "evm.deployedBytecode.sourceMap",
+                "metadata"
+              ],
+              "": ["ast"]
+            }
+          },
+          metadata: {
+            bytecodeHash: "none",
+          },
         },
       },
       {
         version: "0.8.7",
         settings: {
           viaIR: true,
+          evmVersion: "istanbul",
           optimizer: {
             enabled: true,
-            runs: 1,
+            runs: 200,
           },
-          evmVersion: "istanbul",
+          outputSelection: {
+            "*": {
+              "*": [
+                "evm.bytecode.object",
+                "evm.deployedBytecode.object",
+                "abi",
+                "evm.bytecode.sourceMap",
+                "evm.deployedBytecode.sourceMap",
+                "metadata"
+              ],
+              "": ["ast"]
+            }
+          },
+          metadata: {
+            bytecodeHash: "none",
+          },
         },
       }
     ],

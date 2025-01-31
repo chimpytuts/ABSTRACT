@@ -1,8 +1,9 @@
-const { Wallet, Provider } = require("zksync-web3");
+const { Wallet } = require("zksync-web3");
 const { Deployer } = require("@matterlabs/hardhat-zksync-deploy");
 const hre = require("hardhat");
 
-async function main() {
+// The main deploy function needs to be exported
+module.exports = async function (hre) {
   console.log("Starting deployment process...");
 
   try {
@@ -11,8 +12,7 @@ async function main() {
       throw new Error("PRIVATE_KEY environment variable is not set");
     }
 
-    const provider = new Provider("https://api.mainnet.abs.xyz");
-    const wallet = new Wallet(process.env.PRIVATE_KEY, provider);
+    const wallet = new Wallet(process.env.PRIVATE_KEY);
     console.log("Wallet initialized:", wallet.address);
 
     const deployer = new Deployer(hre, wallet);
@@ -36,15 +36,20 @@ async function main() {
     console.log("✅ Deployment completed!");
     console.log("Vault deployed to:", vault.address);
     console.log("Transaction hash:", vault.deployTransaction.hash);
+
+    return vault;
   } catch (error) {
     console.error("❌ Deployment failed:", error);
-    process.exit(1);
+    throw error;
   }
-}
+};
 
-main()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+// If you want to run it standalone
+if (require.main === module) {
+  module.exports(hre)
+    .then(() => process.exit(0))
+    .catch((error) => {
+      console.error(error);
+      process.exit(1);
+    });
+}
